@@ -1,0 +1,47 @@
+:root {
+  /* Backgrounds */
+  --bg-primary: #0f1117;
+  --bg-secondary: #161a23;
+  --bg-tertiary: #1d2330;
+  --bg-hover: #252c3b;
+
+  /* Text */
+  --text-primary: #f3f4f6;
+  --text-secondary: #b6bcc8;
+  --text-muted: #7f8796;
+
+  /* Borders */
+  --border-color: #2a3142;
+
+  /* Accent Colors */
+  --accent-primary: #7c5cff;
+  --accent-secondary: #5eead4;
+  --accent-hover: #9373ff;
+
+  /* Status Colors */
+  --success: #22c55e;
+  --warning: #facc15;
+  --danger: #ef4444;
+  --info: #38bdf8;
+
+  /* Card */
+  --card-bg: #171c26;
+  --card-shadow: rgba(0, 0, 0, 0.35);
+
+  /* Inputs */
+  --input-bg: #11151d;
+  --input-border: #2f3747;
+  --input-focus: #7c5cff;
+
+  /* Sidebar */
+  --sidebar-bg: #0c0f15;
+  --sidebar-hover: #1c2230;
+
+  /* AI Panel */
+  --ai-panel-bg: #131923;
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #7c5cff 0%, #5eead4 100%);
+
+  --gradient-dark: linear-gradient(180deg, #0f1117 0%, #161a23 100%);
+}
