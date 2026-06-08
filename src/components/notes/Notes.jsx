@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "../../context/AuthContext";
 import {
   collection,
@@ -9,6 +9,7 @@ import {
   serverTimestamp,
   updateDoc,
   doc,
+  deleteDoc,
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import { askGemini } from "../../utils/gemini";
@@ -20,6 +21,10 @@ export default function Notes() {
   const [notes, setNotes] = useState([]);
   const [resReceived, setResReceived] = useState(false);
   const [response, setResponse] = useState("");
+  const [update, setUpdate] = useState(false);
+  const [id, setId] = useState("");
+  const scrollRef = useRef();
+  const aiRef = useRef();
 
   useEffect(() => {
     if (!user) return;
@@ -59,6 +64,40 @@ export default function Notes() {
     }
   };
 
+  const startEdit = (title, content, id) => {
+    setTitle(title);
+    setContent(content);
+    setId(id);
+    setUpdate(true);
+    scrollRef.current.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handleUpdateNote = async (e) => {
+    e.preventDefault();
+
+    try {
+      const notesRef = doc(db, "users", user.uid, "notes", id);
+
+      await updateDoc(notesRef, {
+        title: title,
+        content: content,
+        createdAt: serverTimestamp(),
+      });
+
+      setTitle("");
+      setContent("");
+      setId("");
+      setUpdate(false);
+    } catch (error) {
+      alert("Failed to save note: " + error.message);
+    }
+  };
+
+  const handleDelete = (deleteID) => {
+    const notesRef = doc(db, "users", user.uid, "notes", deleteID);
+    deleteDoc(notesRef);
+  };
+
   const askAI = async (noteContent, noteID) => {
     try {
       console.log("Hi");
@@ -66,7 +105,7 @@ export default function Notes() {
         btnClicked: true,
       });
       const aiRes = await askGemini(
-        `Summarize the core takeaways of this note into exactly 3 bullet points using short phrases. Note text: ${noteContent}`,
+        `Summarize the core takeaways of this note into exactly 1 small paragraph using short phrases. Note text: ${noteContent}`,
       );
       setResponse(aiRes);
       await updateDoc(doc(db, "users", user.uid, "notes", noteID), {
@@ -76,6 +115,7 @@ export default function Notes() {
         btnClicked: false,
       });
       setResReceived(true);
+      aiRef.current.style.display = "none";
     } catch (error) {
       alert(
         "model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.",
@@ -88,7 +128,10 @@ export default function Notes() {
   };
 
   return (
-    <div style={{ maxWidth: "600px", margin: "0 auto", padding: "20px" }}>
+    <div
+      style={{ maxWidth: "600px", margin: "0 auto", padding: "20px" }}
+      ref={scrollRef}
+    >
       <div className="relative min-h-screen w-full bg-[var(--bg-primary)] px-4 py-12 flex flex-col items-center justify-center overflow-hidden shadow-[0_0_15px_5px_rgba(255,255,255,0.5)] rounded-[25px]">
         <div className="absolute top-[-10%] left-[-10%] h-[500px] w-[500px] rounded-full bg-[var(--accent-primary)] opacity-[0.03] blur-[120px] pointer-events-none"></div>
         <div className="absolute bottom-[-10%] right-[-10%] h-[500px] w-[500px] rounded-full bg-[var(--accent-secondary)] opacity-[0.02] blur-[120px] pointer-events-none"></div>
@@ -98,7 +141,6 @@ export default function Notes() {
 
         {/* Creation Form */}
         <form
-          onSubmit={handleAddNote}
           style={{
             display: "flex",
             flexDirection: "column",
@@ -124,18 +166,36 @@ export default function Notes() {
             style={{ padding: "8px", fontSize: "16px", minHeight: "100px" }}
             className="w-full px-4 py-3 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-muted)] text-sm font-medium transition-all duration-200 hover:bg-[var(--bg-tertiary)] hover:border-[var(--border-color)] focus:outline-none focus:bg-[var(--input-bg)] focus:border-[var(--input-focus)] focus:ring-4 focus:ring-[var(--input-focus)]/10"
           />
-          <button
-            type="submit"
-            style={{
-              padding: "10px",
-              cursor: "pointer",
-              background: "#007bff",
-              color: "white",
-              border: "none",
-            }}
-          >
-            Save Note
-          </button>
+          {!update && (
+            <button
+              type="submit"
+              style={{
+                padding: "10px",
+                cursor: "pointer",
+                background: "#007bff",
+                color: "white",
+                border: "none",
+              }}
+              onClick={handleAddNote}
+            >
+              Save Note
+            </button>
+          )}
+          {update && (
+            <button
+              type="submit"
+              style={{
+                padding: "10px",
+                cursor: "pointer",
+                background: "#007bff",
+                color: "white",
+                border: "none",
+              }}
+              onClick={handleUpdateNote}
+            >
+              Update Note
+            </button>
+          )}
         </form>
 
         {/* Rendered Notes List */}
@@ -144,7 +204,9 @@ export default function Notes() {
             Your Saved Notes ({notes.length})
           </h3>
           {notes.length === 0 ? (
-            <p>No notes found. Create your first note above!</p>
+            <p className="text-white">
+              No notes found. Create your first note above!
+            </p>
           ) : null}
 
           {user &&
@@ -179,6 +241,7 @@ export default function Notes() {
                     </div>
                   </div>
                 )}
+
                 <button
                   style={{
                     padding: "10px",
@@ -188,9 +251,36 @@ export default function Notes() {
                     border: "none",
                   }}
                   onClick={() => askAI(note.content, note.id)}
+                  ref={aiRef}
                 >
                   {!note.btnClicked ? "Analyse with AI" : "Loading..."}
                 </button>
+                <div className="grid grid-cols-2 gap-5">
+                  <button
+                    style={{
+                      padding: "10px",
+                      cursor: "pointer",
+                      background: "white",
+                      color: "#007bff",
+                      border: "1px solid",
+                    }}
+                    onClick={() => startEdit(note.title, note.content, note.id)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    style={{
+                      padding: "10px",
+                      cursor: "pointer",
+                      background: "red",
+                      color: "white",
+                      border: "1px solid red",
+                    }}
+                    onClick={() => handleDelete(note.id)}
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             ))}
         </div>

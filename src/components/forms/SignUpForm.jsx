@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "../../firebase";
@@ -10,6 +10,8 @@ const SignUpForm = () => {
   const [email, setEmail] = useState("");
   const [pwd, setPwd] = useState("");
   const [conPwd, setConPwd] = useState("");
+
+  const navigate = useNavigate();
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -31,6 +33,7 @@ const SignUpForm = () => {
         displayName: name,
       });
       alert("User registered: " + userCredential.user.email);
+      navigate("/");
     } catch (error) {
       alert(error.message);
     }

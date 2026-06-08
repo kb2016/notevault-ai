@@ -15,8 +15,9 @@ const Homepage = () => {
         <div className=" p-10 rounded-xl bg-[var(--bg-primary)]">
           <div className="max-w-[600px] mx-auto p-[20px]">
             {user && (
-              <h1 className="text-[32px] font-bold uppercase tracking-[0.2em] bg-gradient-to-r from-[var(--accent-secondary)] to-[var(--info)] bg-clip-text text-transparent mb-1 text-center animate-fade-in">
-                Hello {user ? user?.displayName : "User"}
+              <h1 className="text-[32px] font-bold tracking-[0.2em] bg-gradient-to-r from-[var(--accent-secondary)] to-[var(--info)] bg-clip-text text-transparent mb-1 text-center animate-fade-in">
+                Hello <br />
+                {user ? user?.displayName : "User"}
               </h1>
             )}
             {!user && (

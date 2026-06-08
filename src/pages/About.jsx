@@ -21,7 +21,6 @@ const techStack = [
   "Tailwind CSS",
   "Firebase",
   "Gemini API",
-  "Vercel",
 ];
 
 export default function About() {

@@ -40,10 +40,13 @@ export default function Contact() {
         message: msg,
         createdAt: serverTimestamp(),
       });
-      console.log("Message sent successfully with ID: ", docRef.id);
+      alert("Thank you for contacting us!");
+      setName("");
+      setEmail("");
+      setMsg("");
       return true;
     } catch (error) {
-      console.error("Error adding message: ", error);
+      alert("Error adding message: ", error);
       return false;
     }
   };
@@ -76,6 +79,7 @@ export default function Contact() {
                   type="text"
                   placeholder="Enter your name"
                   className="w-full bg-[var(--input-bg)] border border-[var(--input-border)] rounded-xl px-4 py-3 outline-none focus:border-[var(--input-focus)]"
+                  value={name}
                   onInput={handleName}
                 />
               </div>
@@ -91,6 +95,7 @@ export default function Contact() {
                   placeholder="Enter your email"
                   className="w-full bg-[var(--input-bg)] border border-[var(--input-border)] rounded-xl px-4 py-3 outline-none focus:border-[var(--input-focus)]"
                   onInput={handleEmail}
+                  value={email}
                 />
               </div>
 
@@ -105,13 +110,14 @@ export default function Contact() {
                   placeholder="Write your message..."
                   className="w-full bg-[var(--input-bg)] border border-[var(--input-border)] rounded-xl px-4 py-3 outline-none focus:border-[var(--input-focus)] resize-none"
                   onInput={handleMsg}
+                  value={msg}
                 />
               </div>
 
               {/* BUTTON */}
               <button
                 type="submit"
-                className="w-full bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] transition rounded-xl py-3 font-semibold"
+                className="w-full bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] transition rounded-xl py-3 font-semibold cursor-pointer"
                 onClick={saveMessage}
               >
                 Send Message

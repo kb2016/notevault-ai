@@ -3,6 +3,21 @@ import { Link } from "react-router-dom";
 
 const Sidebar = () => {
   const [sideBarState, setSideBarState] = useState(false);
+  const [menuOptState, setMenuOptState] = useState(false);
+
+  const handleSideBar = () => {
+    console.log(sideBarState);
+
+    if (!sideBarState) {
+      setSideBarState((prev) => !prev);
+      setTimeout(() => {
+        setMenuOptState((prev) => !prev);
+      }, 300);
+    } else {
+      setSideBarState((prev) => !prev);
+      setMenuOptState((prev) => !prev);
+    }
+  };
 
   return (
     <aside
@@ -15,7 +30,7 @@ const Sidebar = () => {
         <ion-icon
           name="reorder-four-outline"
           className="text-3xl cursor-pointer"
-          onClick={() => setSideBarState((prev) => !prev)}
+          onClick={handleSideBar}
         ></ion-icon>
 
         <h2
@@ -27,7 +42,7 @@ const Sidebar = () => {
       </div>
 
       {/* Navigation Links */}
-      {sideBarState && (
+      {menuOptState && (
         <ul className="space-y-4 mt-6">
           <li>
             <Link
